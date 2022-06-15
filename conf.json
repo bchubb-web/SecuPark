@@ -1,0 +1,12 @@
+{
+    "delta":5,
+    "fps":60,
+    "camera":0,
+    "api_key":"",
+    "SQL":{
+        "user":"root",
+        "password":"",
+        "host":"127.0.0.1",
+        "database": "anpr_records"
+    }
+}
