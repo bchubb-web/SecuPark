@@ -1,0 +1,14 @@
+{
+  "name": "intrepark",
+  "version": "1.0.0",
+  "description": "project to deliver a secure parking experience to users and business owners",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Billy Chubb",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}

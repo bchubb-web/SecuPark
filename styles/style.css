@@ -1,0 +1,8 @@
+header{
+    border-bottom: 1px yellow solid;
+}
+
+.header-cont{
+    display: flex;
+    flex-direction: row;
+}
