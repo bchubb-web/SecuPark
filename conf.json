@@ -3,6 +3,7 @@
     "fps":60,
     "camera":0,
     "api_key":"",
+    "site_ID":1,
     "SQL":{
         "user":"root",
         "password":"",

@@ -12,6 +12,7 @@ from rect_detection import rect_detector
 from imutils.video import VideoStream
 from imutils.video import FPS
 from imutils.object_detection import non_max_suppression
+import base64
 
 class feed_handler:
     _status: str
@@ -31,7 +32,7 @@ class feed_handler:
         #get the video input from webcam
         ret,frame = self._stream.read()
         height,width = frame.shape[:2]
-
+ 
         #resize the frame
         frame = cv2.resize(frame,(400,int((height*400)/width)))
         self._frame = frame
@@ -96,9 +97,12 @@ class feed_handler:
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 return False
 
-    def output(self:object, plate:bool) -> None:
-        if plate: 
+    def output(self:object, motion:bool) -> None:
+        if motion: 
             cv2.imshow("frame", self._frame)
+            anpr = anpr_handler(True,"tits")
+            b64 = anpr.endcode_b64(self._frame)
+
             cv2.imshow("f_frame", self._f_frame)
             cv2.imshow("t_frame", self._t_frame)
             
@@ -146,9 +150,21 @@ class anpr_handler:
     def get_api_key(self:object) -> str:
         return self._api_key
 
-    def find_data(self:object) -> None:
-        pass
+    def endcode_b64(self:object, frame) -> str:
+        retval, buffer_img= cv2.imencode('.jpg', frame)
+        data = base64.b64encode(buffer_img).decode("UTF-8")
+        return data
 
+
+class http_handler:
+    _payload = ""
+
+
+    def __init__(self:object, site:int):
+        self._endpoint = "localhost:3000/anpr/"+site
+
+    def post_b_64(self:object, b:str) -> None:
+        pass
 
 def main():
 

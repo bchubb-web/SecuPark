@@ -1,11 +1,13 @@
 //MODULES
 const {exec} = require('child_process');
-//const bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 const express = require("express");
 const app = express();
 const path = require("path");
 const sql = require("mysql");
 
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 app.use('/public/styles',express.static(__dirname+'/styles'));
 
@@ -22,14 +24,15 @@ app.get('/begin', (req,res) => {
 
 
 
-app.post('/check/:locationID', (req,res) => {
+app.post('/anpr/:locationID', (req,res) => {
     var LID = req.params.locationID;
-    var frame = req.body.frame;
-    console.log(LID);
-    console.log(frame);
-    
+    var data = req.body;
+    var frame = data.b_64;
+
+    console.log("Site:"+LID+" frame:"+frame);
 
     res.send(200);
 });
 
-app.listen(3000,console.log('site live'));
+console.log("Starting up...")
+app.listen(3000,console.log('Server live'));
