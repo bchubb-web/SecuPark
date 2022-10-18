@@ -22,6 +22,9 @@ app.get('/begin', (req,res) => {
     res.sendFile(path.join(__dirname)+"\\begin.html")
 });
 
+app.get('/contact', (req,res) => {
+    res.sendFile(path.join(__dirname)+"\\contact.html")
+});
 
 
 app.post('/anpr/:locationID', (req,res) => {
@@ -31,7 +34,7 @@ app.post('/anpr/:locationID', (req,res) => {
 
     console.log("Site:"+LID+" frame:"+frame);
 
-    res.send(200);
+    res.sendStatus(200);
 });
 
 console.log("Starting up...")
