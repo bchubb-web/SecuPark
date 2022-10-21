@@ -1,9 +1,7 @@
 import cv2
 from datetime import datetime
-import mysql.connector
-import requests
-#from google.cloud import vision_vlp3beta1 as vision
 import numpy as np
+from numba import jit, cuda
 import imutils
 import time
 import json
@@ -12,9 +10,17 @@ from rect_detection import rect_detector
 from imutils.video import VideoStream
 from imutils.video import FPS
 from imutils.object_detection import non_max_suppression
+import base64
 
+from SQL import sql_handler
+from ANPR import anpr_handler
+
+
+
+#HANDLES MAIN VIDEO FEED
 class feed_handler:
     _status: str
+
     #bounding values for yellow
     y_lower = [16, 120, 0]
     y_upper = [40,255,255]
@@ -23,6 +29,7 @@ class feed_handler:
     w_upper = [359,5,255]
 
     def __init__(self:object, cam:int ,number:str):# init the data for the camera, store as attributes
+        
         self._CAMERA = cam
         self._ID = number
         self._stream = cv2.VideoCapture(cam)
@@ -31,7 +38,7 @@ class feed_handler:
         #get the video input from webcam
         ret,frame = self._stream.read()
         height,width = frame.shape[:2]
-
+ 
         #resize the frame
         frame = cv2.resize(frame,(400,int((height*400)/width)))
         self._frame = frame
@@ -48,7 +55,6 @@ class feed_handler:
         self._f_frame = result
         
         
-
     def thresh_frame(self:object) -> None:
         grey = cv2.cvtColor(self._f_frame, cv2.COLOR_BGR2GRAY)# convert to black and white
         blurred = cv2.GaussianBlur(grey, (5, 5), 0) # blur the details
@@ -96,9 +102,12 @@ class feed_handler:
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 return False
 
-    def output(self:object, plate:bool) -> None:
-        if plate: 
+    def output(self:object, motion:bool) -> None:
+        if motion: 
             cv2.imshow("frame", self._frame)
+            anpr = anpr_handler(True,"tits")
+            b64 = anpr.endcode_b64(self._frame)
+
             cv2.imshow("f_frame", self._f_frame)
             cv2.imshow("t_frame", self._t_frame)
             
@@ -106,49 +115,15 @@ class feed_handler:
         else: cv2.imshow("no plate found", self._frame)
 
 
-class sql_handler:
-
-    def __init__(self:object, details:dict) -> None:
-        self._user = details["user"]
-        self._password = details["password"]
-        self._host = details["host"]
-        self._db_name = details["database"]
-        
-    def connect(self:object) -> bool:
-        self._db = mysql.connector.connect(user=self._user, password=self._password, host=self._host, database=self._db_name)
-
-        if self._db:
-            self._cursor = self._db.cursor()
-            print("connection opened")
-            return True
-        else:
-            print("connection failed")
-            return False
-
-    def execute(self:object, query:str, vals:any) -> bool:
-        self.cursor.execute(query,vals)
-        self._db.commit()
-
-    def close(self) -> None:
-        self._db.close()
-        print("connection closed")
+class http_handler:
+    _payload = ""
 
 
-class anpr_handler:
-    _endpoint = "https://www."
-    
-    def __init__(self:object, frame:any, key:str):
-        self._api_key = key
+    def __init__(self:object, site:int):
+        self._endpoint = "localhost:3000/anpr/"+site
 
-    def get_plate(self:object) -> str:
-        return self._plate
-
-    def get_api_key(self:object) -> str:
-        return self._api_key
-
-    def find_data(self:object) -> None:
+    def post_b_64(self:object, b:str) -> None:
         pass
-
 
 def main():
 

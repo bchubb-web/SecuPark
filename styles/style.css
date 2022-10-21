@@ -89,7 +89,7 @@ body{
 header{
     height: fit-content;
     font-size: 1.8rem;
-    margin: 5.6rem 8rem 0;
+    margin: 1.6rem 8rem 0;
     color: #9c3ffa;
     
 }
@@ -254,5 +254,35 @@ header{
 
 footer{
   height: 30vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   background-color: rgb(24, 24, 24);
+}
+
+
+.footer-deets{
+  display: flex;
+  justify-content: center;
+}
+
+.designer{
+  margin: 0.24rem 1rem 1.24rem;
+  color: #eaeaea;
+  font-family: 'Poppins', sans-serif;
+}
+
+.designer>a{
+  font-weight: bold;
+  text-decoration: none;
+  color: rgb(73, 47, 212);
+}
+
+.designer>a:hover{
+  color: #da7f11;
+}
+
+.designer>span{
+  margin-left: 1.24rem;
+  display: inline;
 }
