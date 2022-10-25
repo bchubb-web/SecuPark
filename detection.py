@@ -1,4 +1,8 @@
 import cv2
+import json
+import base64
+from matplotlib.pyplot import contour
+import numpy as np
 
 
 class anpr_handler:
@@ -24,16 +28,44 @@ class rect_detect:
     def __init__(self) -> None:
         pass
 
-    def plate(self,c) -> any:
-        peri = cv2.arcLength(c, True)
-        approx = cv2.approxPolyDP(c,0.04*peri, True)
 
-        if len(approx) == 4:
-            (x,y,w,h) = cv2.boundingRect(approx)
-            aspect_ratio = w/float(h)
+    def detect(self:object, grey:any, master:any) -> any:
+        #grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            if aspect_ratio < 1.5:
-                return False
-            return True
-        return False
+        ret, thrash = cv2.threshold(grey,240,255, cv2.CHAIN_APPROX_NONE)
+        contours, hierarchy = cv2.findContours(thrash, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
+        for contour in contours:
+            approx = cv2.approxPolyDP(contour, 0.04 * cv2.arcLength(contour, True), True)
+            
+            x,y,w,h = cv2.boundingRect(approx)
+            ar = float(w)/h
+            if len(approx) == 4 and cv2.arcLength(contour, True) > 100 and ar >= 2:
+                cv2.drawContours(master, [approx], 0, (0,255,0),5)
+
+        return master
+
+
+
+def main():
+    config = open("conf.json")
+    conf = json.load(config)
+    stream = cv2.VideoCapture(conf["camera"])
+    rect = rect_detect()
+
+    skip = True
+
+    while True:
+        ret,frame = stream.read()
+
+        frame = rect.test(frame)
+
+        cv2.imshow("Detection Test", frame)
+        if cv2.waitKey(1)&0xff == ord('q'):
+            break#press Q to exit the program
+
+    stream.release()#stop video capture
+    cv2.destroyAllWindows()#close window
+
+if __name__ == '__main__':
+    main()

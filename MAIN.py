@@ -6,14 +6,12 @@ import imutils
 import time
 import json
 import re
-from rect_detection import rect_detector
 from imutils.video import VideoStream
 from imutils.video import FPS
 from imutils.object_detection import non_max_suppression
-import base64
 
 from SQL import sql_handler
-from ANPR import anpr_handler
+from detection import rect_detect, anpr_handler
 
 
 
@@ -22,11 +20,11 @@ class feed_handler:
     _status: str
 
     #bounding values for yellow
-    y_lower = [16, 120, 0]
+    y_lower = [16, 100, 0]
     y_upper = [40,255,255]
     #bounding values for white
-    w_lower = [0,0,168]
-    w_upper = [359,5,255]
+    w_lower = [0,0,200]#light grey
+    w_upper = [359,5,255]#white
 
     def __init__(self:object, cam:int ,number:str):# init the data for the camera, store as attributes
         
@@ -61,32 +59,6 @@ class feed_handler:
         thresh = cv2.threshold(blurred, 60, 255, cv2.THRESH_BINARY)[1]# find threshhold of the areas
         self._t_frame = thresh
 
-    def shape_frame_format(self:object) -> None:
-        resized = imutils.resize(self._frame, width=300)
-        ratio = self._frame.shape[0] / float(resized.shape[0])
-
-        grey = cv2.cvtColor(self._frame, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(grey, (5, 5), 0)
-        thresh = cv2.threshold(blurred, 60, 255, cv2.THRESH_BINARY)[1]
-        self._f_frame = thresh
-
-        cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-        cv2.CHAIN_APPROX_SIMPLE)
-        cnts = imutils.grab_contours(cnts)
-        detect = rect_detector()
-
-        for c in cnts:
-
-            M = cv2.moments(c)
-
-            if detect.plate(c):
-
-                c = c.astype("float")
-                c *= ratio
-                c = c.astype("int")
-                cv2.drawContours(self._frame, [c], -1, (0, 255, 0), 2)
-
-
     def loop(self:object, fps:int) -> bool:
         prev = 0
         while True:
@@ -97,7 +69,6 @@ class feed_handler:
                 prev = time.time()
                 self.filter_frame()
                 self.thresh_frame()
-                #self.shape_frame_format()
                 self.output(self.detect_motion())
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 return False
@@ -110,20 +81,13 @@ class feed_handler:
 
             cv2.imshow("f_frame", self._f_frame)
             cv2.imshow("t_frame", self._t_frame)
-            
+
+            test = rect_detect()
+            master = test.detect(self._t_frame, self._frame)
+            cv2.imshow("DETECTED", master)
             
         else: cv2.imshow("no plate found", self._frame)
 
-
-class http_handler:
-    _payload = ""
-
-
-    def __init__(self:object, site:int):
-        self._endpoint = "localhost:3000/anpr/"+site
-
-    def post_b_64(self:object, b:str) -> None:
-        pass
 
 def main():
 
