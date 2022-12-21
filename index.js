@@ -37,5 +37,5 @@ app.post('/anpr/:locationID', (req,res) => {
     res.sendStatus(200);
 });
 
-console.log("Starting up...")
+console.log("Starting up...");
 app.listen(3000,console.log('Server live'));

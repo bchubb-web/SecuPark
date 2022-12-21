@@ -40,8 +40,8 @@ class rect_detect:
             
             x,y,w,h = cv2.boundingRect(approx)
             ar = float(w)/h
-            if len(approx) == 4 and cv2.arcLength(contour, True) > 100 and ar >= 2:
-                cv2.drawContours(master, [approx], 0, (0,255,0),5)
+            if len(approx) == 4 and cv2.arcLength(contour, True) > 100 and ar >= 1:
+                cv2.drawContours(master, [approx], 0, (0,255,0),2)
 
         return master
 
