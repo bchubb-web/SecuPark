@@ -1,2 +1,5 @@
 node_modules
+package_lock.json
 __pycache__
+*/node_modules
+*/package_lock.json
