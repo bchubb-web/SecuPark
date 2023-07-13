@@ -1,0 +1,1 @@
+class rect_detection:
