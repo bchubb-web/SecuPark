@@ -1,0 +1,3 @@
+/home/bchubb/Personal/SecuPark/cpp_camera/CMakeFiles/DisplayImage.dir
+/home/bchubb/Personal/SecuPark/cpp_camera/CMakeFiles/edit_cache.dir
+/home/bchubb/Personal/SecuPark/cpp_camera/CMakeFiles/rebuild_cache.dir
