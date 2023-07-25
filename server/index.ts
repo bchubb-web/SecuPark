@@ -5,27 +5,30 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-//currently working on 
+// currently working on 
+// posts base64 image to google cloud api,
+//
+// returns decoded plate
 app.get('/detect/:b64image', async (req, res) => {
     const decoded = await fetch("https://vision.googleapis.com/v1/images:annotate", {
         method: "POST",
-    headers: {
-        "Content-Type": "application/json;charset=utf-8",
+        headers: {
+            "Content-Type": "application/json;charset=utf-8",
             "Authorization": "Bearer ",
-        "x-goog-user-project": "secupark-393921"
-    },
-    body: JSON.stringify({
-        "requests": [{
-            "image": { "content": req.params.b64image },
-            "features": [
-                { "type": "TEXT_DETECTION" }
-            ]
-        }]
-    })
-
+            "x-goog-user-project": "secupark-393921"
+        },
+        body: JSON.stringify({
+            "requests": [{
+                "image": { "content": req.params.b64image },
+                "features": [
+                    { "type": "TEXT_DETECTION" }
+                ]
+            }]
+        })
     });
-    Buffer.from(req.params.b64image, "base64");
-    res.sendStatus(200);
+    const ocrText = await decoded.json();
+    //Buffer.from(req.params.b64image, "base64");
+    res.send(JSON.stringify(ocrText));
 });
 
 app.post('/anpr/:locationID', (req,res) => {
