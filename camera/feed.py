@@ -8,14 +8,15 @@ class feed_handler:
         # init the data for the camera, store as attributes
         self._stream = cv2.VideoCapture(cam)
 
-    def set_frame(self: object) -> None:
+    def set_frame(self: object) -> bool:
+
         # get the video input from webcam
         ret, frame = self._stream.read()
         height, width = frame.shape[:2]
 
         # resize the frame
-        frame = cv2.resize(frame, (400, int((height*400)/width)))
-        self._frame = frame
+        self._frame = cv2.resize(frame, (400, int((height*400)/width)))
+        return ret
 
     def motion_detected(self: object) -> bool:
         return True
@@ -36,20 +37,6 @@ class feed_handler:
         thresh = cv2.dilate(thresh, None, iterations=2)
         self._t_frame = thresh
 
-    def loop(self: object, fps: int) -> bool:
-        prev = 0
-        while True:
-            time_elapsed = time.time() - prev
-            self.set_frame()
-
-            if time_elapsed > 1./fps:
-                prev = time.time()
-                self.filter_frame()
-                self.thresh_frame()
-                self.output(self.detect_motion())
-                # print(1./time_elapsed)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                return False
 
     def output(self: object, motion: bool) -> None:
         if motion:
